@@ -49,13 +49,26 @@ class Clock():
         time_delta = time_delta if 0 < abs(time_delta) < targeted_difference else 0
         self.adjusted_time_delta += time_delta / 3
 
-    
+            
     def show_timer(self):
-        minutes_left = bus_timer.query_minutes_left(route_id = config.route_id, 
-                                                    route_direction = config.route_direction, 
-                                                    bus_stop_code = config.bus_stop_code)
-                                                    
-        self.display.show_text('{0:4s}  {1:>2s}'.format(config.route_id, minutes_left) )
+        try:
+            status_code, reason, minutes_left = bus_timer.query_minutes_left(route_id = config.route_id, 
+                                                                             route_direction = config.route_direction, 
+                                                                             bus_stop_code = config.bus_stop_code)
+        except Exception as e:
+            status_code, reason = 404, str(e)
+            
+        print('status_code: {0}, reason: {1}'.format(status_code, reason))
+        
+        if status_code != 200:
+            led.blink(self.buzzer, 
+                      times = 1, on_seconds = 0.1, off_seconds = 0.1, 
+                      high_is_on = self.led_high_is_on)
+                      
+            self.display.show_text('Error')
+            
+        else:
+            self.display.show_text('{0:4s}  {1:>2s}'.format(config.route_id, minutes_left))
             
             
     def refresh_timer(self, on_second = 45):

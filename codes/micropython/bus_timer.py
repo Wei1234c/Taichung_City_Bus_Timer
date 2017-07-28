@@ -29,6 +29,8 @@ def get_minutes_left(schedule):
     minutes_left = schedule[0].replace('_', '')
     if minutes_left.isdigit() and int(minutes_left) >= 0:
         return minutes_left
+    return '  '
+        
     
 
 def query_minutes_left(route_id, route_direction, bus_stop_code):
@@ -36,10 +38,11 @@ def query_minutes_left(route_id, route_direction, bus_stop_code):
     base_url = 'http://citybus.taichung.gov.tw/ibus/RealRoute/aspx/RealRoute.ashx?Lang=Cht&BusType=0&Data=' + route_id + '_,' + route_direction
     # url_bus_stops = base_url + '&Type=GetStop'  # 站牌名稱 編號 座標
     url_schedules = base_url + '&Type=GetFreshData'  # 站牌編號 到站時刻 
-
-    schedules = requests.get(url_schedules).text
+    
+    resp = requests.get(url_schedules)
+    schedules = resp.text
     schedules = split_text(schedules)
     schedule = get_ETA(schedules, bus_stop_code)
     print(schedule)
 
-    return get_minutes_left(schedule)
+    return resp.status_code, resp.reason, get_minutes_left(schedule)
