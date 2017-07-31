@@ -1,21 +1,16 @@
 import urequests as requests
-import gc
-gc.collect()
 
 
 def split_text(text):
-    text = text.split('@')[0] 
+    text = text.split('@')[0]
     length = len(text)
     start = 0
     end = 0
     
     while end < length - 1 and end >= 0:
-        start = text.find('|', end)
         end = text.find('|', start + 1)
-
         part = text[start + 1:end]
-        yield part.split(',')
-        
+        yield part.split(',')        
         start = end  
         
         
@@ -29,8 +24,7 @@ def get_minutes_left(schedule):
     minutes_left = schedule[0].replace('_', '')
     if minutes_left.isdigit() and int(minutes_left) >= 0:
         return minutes_left
-    return '  '
-        
+    return '  '        
     
 
 def query_minutes_left(route_id, route_direction, bus_stop_code):
