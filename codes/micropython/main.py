@@ -22,10 +22,11 @@ import led
 led.blink_on_board_led(times = 2)
 
 
-
 # Display ____________________________
 import wf8266kd
 display = wf8266kd.WF8266KD()
+
+
 import ntp_clock 
 clock = ntp_clock.Clock(display)
 clock.run()
