@@ -2,7 +2,7 @@ import time
 import ntp_client
 import led
 import gc
-import config
+import config_tcbt
 import bus_timer
 
 
@@ -25,6 +25,9 @@ class Clock():
         
         self._on_hour(hour, minute, second)
         
+        if minute == 59 and second == 0: 
+            ntp_client.calibrate_time_upython()
+        
         
     def _on_hour(self, hour, minute, second): 
         
@@ -39,9 +42,7 @@ class Clock():
                       high_is_on = self.led_high_is_on)
             led.blink(self.buzzer, 
                       times = 1, on_seconds = 0.5, off_seconds = 0.5, 
-                      high_is_on = self.led_high_is_on)   
-            
-            ntp_client.calibrate_time_upython()
+                      high_is_on = self.led_high_is_on)
         
         
     def adjust_time_delta(self, start_time, end_time, targeted_difference = 1000):
@@ -52,9 +53,9 @@ class Clock():
             
     def show_timer(self):
         try:
-            status_code, reason, minutes_left = bus_timer.query_minutes_left(route_id = config.route_id, 
-                                                                             route_direction = config.route_direction, 
-                                                                             bus_stop_code = config.bus_stop_code)
+            status_code, reason, minutes_left = bus_timer.query_minutes_left(route_id = config_tcbt.route_id, 
+                                                                             route_direction = config_tcbt.route_direction, 
+                                                                             bus_stop_code = config_tcbt.bus_stop_code)
         except Exception as e:
             status_code, reason = 404, str(e)
             
@@ -68,7 +69,7 @@ class Clock():
             self.display.show_text('Error')
             
         else:
-            self.display.show_text('{0:4s}  {1:>2s}'.format(config.route_id, minutes_left))
+            self.display.show_text('{0:4s}  {1:>2s}'.format(config_tcbt.route_id, minutes_left))
             
             
     def refresh_timer(self, on_second = 45):
